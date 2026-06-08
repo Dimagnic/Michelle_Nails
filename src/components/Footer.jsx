@@ -59,7 +59,7 @@ const Footer = () => {
         {/* Bottom */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', letterSpacing: '1px' }}>
-            © 2026 Michelle Nails · Puebla, México
+            © 2026 Michelle Nails · Puebla, México. Desarrollado por el Ing. Nicolás Gontaro.
           </span>
           <div style={{ display: 'flex', gap: 12 }}>
             {[MessageCircle, Instagram].map((Icon, i) => (
