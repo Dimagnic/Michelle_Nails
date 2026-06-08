@@ -92,7 +92,7 @@ const GalleryCarousel = ({ images }) => {
       >
         {/* ── DESKTOP: 3 slides ── */}
         {!isMobile && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: 2 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: 2, maxHeight: 460, overflow: 'hidden' }}>
             {[-1, 0, 1].map((offset) => {
               const img = getSlide(offset);
               const isCenter = offset === 0;

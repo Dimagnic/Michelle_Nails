@@ -61,7 +61,7 @@ const Header = () => {
           </button>
 
           {/* Desktop Nav */}
-          <nav style={{ display: 'flex', gap: 28, alignItems: 'center' }} className="hidden md:flex">
+          <nav style={{ gap: 28, alignItems: 'center' }} className="hidden md:flex" >
             {navLinks.map(l => (
               <button key={l.id} onClick={() => scrollTo(l.id)} style={{
                 background: 'none', border: 'none', cursor: 'pointer',
