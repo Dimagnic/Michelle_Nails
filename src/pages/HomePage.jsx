@@ -166,11 +166,6 @@ const HomePage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Michelle Nails | Servicio de Manicura a Domicilio</title>
-        <meta name="description" content="Bienvenida a Michelle Nails. Servicio a domicilio, belleza en tus manos. Manicura, pedicura y uñas acrílicas con la mejor calidad y diseño vibrante." />
-      </Helmet>
-
       <Header />
 
       <button
