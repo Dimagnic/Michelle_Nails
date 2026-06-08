@@ -39,7 +39,7 @@ const BookingForm = ({ services }) => {
   const selectStyle = { ...inputStyle, appearance: 'none', cursor: 'pointer' };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'start', maxWidth: 960, margin: '0 auto' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,420px),1fr))', gap: 'clamp(32px,5vw,64px)', alignItems: 'start', maxWidth: 960, margin: '0 auto' }}>
       {/* Info */}
       <div>
         <div style={{ fontSize: 10, letterSpacing: '4px', color: '#3B9EFF', textTransform: 'uppercase', marginBottom: 14 }}>Reservaciones</div>
@@ -69,7 +69,7 @@ const BookingForm = ({ services }) => {
       {/* Form */}
       <div style={{ background: '#070d14', border: '1px solid rgba(0,102,204,0.2)', padding: 36 }}>
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 16, marginBottom: 16 }}>
             <div><label style={labelStyle}>Nombre *</label><input style={inputStyle} placeholder="Tu nombre" value={form.nombre} onChange={e => set('nombre', e.target.value)} required /></div>
             <div><label style={labelStyle}>Teléfono *</label><input style={inputStyle} placeholder="222 000 0000" value={form.telefono} onChange={e => set('telefono', e.target.value)} required /></div>
           </div>
@@ -82,7 +82,7 @@ const BookingForm = ({ services }) => {
             </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 16, marginBottom: 16 }}>
             <div>
               <label style={labelStyle}>Fecha *</label>
               <input style={inputStyle} type="date" min={new Date().toISOString().split('T')[0]} value={form.fecha} onChange={e => set('fecha', e.target.value)} required />

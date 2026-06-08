@@ -37,7 +37,7 @@ const fadeUp = { hidden:{ opacity:0, y:28 }, show:{ opacity:1, y:0, transition:{
 const stagger = { hidden:{}, show:{ transition:{ staggerChildren:0.1 } } };
 
 const Divider = () => (
-  <div style={{ display:'flex', alignItems:'center', gap:16, padding:'28px 48px', background:'#000' }}>
+  <div style={{ display:'flex', alignItems:'center', gap:16, padding:'28px clamp(16px,5vw,48px)', background:'#000' }}>
     <div style={{ flex:1, height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.4),transparent)' }} />
     <div style={{ width:6, height:6, background:'#0066CC', transform:'rotate(45deg)', flexShrink:0 }} />
     <div style={{ flex:1, height:1, background:'linear-gradient(90deg,rgba(0,102,204,0.4),transparent)' }} />
@@ -101,7 +101,7 @@ const HomePage = () => {
       </button>
 
       {/* ── HERO ── */}
-      <section id="hero" style={{ minHeight:'100vh', background:'linear-gradient(180deg,#000 0%,#010d1a 50%,#011833 100%)', display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'100px 48px 80px', position:'relative', overflow:'hidden' }}>
+      <section id="hero" style={{ minHeight:'100vh', background:'linear-gradient(180deg,#000 0%,#010d1a 50%,#011833 100%)', display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'100px clamp(16px,5vw,48px) 80px', position:'relative', overflow:'hidden', boxSizing:'border-box', width:'100%', maxWidth:'100vw' }}>
         <div style={{ position:'absolute', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(0,102,204,0.16) 0%,transparent 70%)', top:'50%', left:'50%', transform:'translate(-50%,-50%)', pointerEvents:'none' }} />
         <div style={{ position:'absolute', width:350, height:350, borderRadius:'50%', background:'radial-gradient(circle,rgba(59,158,255,0.08) 0%,transparent 70%)', top:'25%', right:'8%', pointerEvents:'none' }} />
 
@@ -119,11 +119,11 @@ const HomePage = () => {
             <motion.p variants={fadeUp} style={{ fontSize:11, letterSpacing:'4px', color:'rgba(255,255,255,0.4)', textTransform:'uppercase', marginBottom:40 }}>
               Uñas Acrílicas · Gel · Nail Art · Pedicure Spa
             </motion.p>
-            <motion.div variants={fadeUp} style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+            <motion.div variants={fadeUp} style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap', width:'100%', maxWidth:440 }}>
               <button className="mn-btn-primary" onClick={() => scrollTo('contacto')}>Agenda tu cita</button>
               <button className="mn-btn-ghost" onClick={() => scrollTo('galeria')}>Ver trabajos</button>
             </motion.div>
-            <motion.div variants={fadeUp} style={{ display:'flex', gap:48, justifyContent:'center', marginTop:60, paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.07)', flexWrap:'wrap' }}>
+            <motion.div variants={fadeUp} style={{ display:'flex', gap:'clamp(20px,5vw,48px)', justifyContent:'center', marginTop:60, paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.07)', flexWrap:'wrap' }}>
               {[['500+','Clientas felices'],['3+','Años de experiencia'],['100%','Materiales premium']].map(([num, label]) => (
                 <div key={label} style={{ textAlign:'center' }}>
                   <div style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:38, fontWeight:300, color:'#fff', lineHeight:1 }}>
@@ -148,7 +148,7 @@ const HomePage = () => {
       <Divider />
 
       {/* ── SERVICIOS ── */}
-      <section id="servicios" style={{ padding:'80px 48px', background:'#000' }}>
+      <section id="servicios" style={{ padding:'80px clamp(16px,5vw,48px)', background:'#000' }}>
         <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
           <SectionHeader eyebrow="Nuestros servicios" title="Diseñado para" italic="realzar tu belleza" />
         </motion.div>
@@ -168,12 +168,12 @@ const HomePage = () => {
       <Divider />
 
       {/* ── PROCESO ── */}
-      <section id="como-funciona" style={{ padding:'80px 48px', background:'#030810' }}>
+      <section id="como-funciona" style={{ padding:'80px clamp(16px,5vw,48px)', background:'#030810' }}>
         <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
           <SectionHeader eyebrow="Cómo funciona" title="Tu experiencia" italic="sin complicaciones" />
         </motion.div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:0, maxWidth:900, margin:'0 auto', position:'relative' }}>
-          <div style={{ position:'absolute', top:28, left:'16%', right:'16%', height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.5),rgba(59,158,255,0.5),rgba(0,102,204,0.5),transparent)' }} />
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'clamp(24px,4vw,0px)', maxWidth:900, margin:'0 auto', position:'relative' }}>
+          <div className='hidden md:block' style={{ position:'absolute', top:28, left:'16%', right:'16%', height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.5),rgba(59,158,255,0.5),rgba(0,102,204,0.5),transparent)' }} />
           {[
             { num:'1', title:'Elige y agenda', desc:'Selecciona tu servicio y reserva tu cita desde la web o WhatsApp en menos de 2 minutos.' },
             { num:'2', title:'Confirmación', desc:'Recibes confirmación inmediata. Te recordamos 24 horas antes de tu cita.' },
@@ -196,7 +196,7 @@ const HomePage = () => {
       {/* ── GALERÍA ── */}
       <section id="galeria" style={{ paddingTop:80, paddingBottom:0, background:'#000', overflow:'hidden' }}>
         <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}
-          style={{ padding:'0 48px', marginBottom:32 }}>
+          style={{ padding:'0 clamp(16px,5vw,48px)', marginBottom:32 }}>
           <SectionHeader eyebrow="Galería de trabajos" title="Arte que" italic="habla por sí solo" />
           <GalleryFilter categories={categories} activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
         </motion.div>
@@ -206,12 +206,12 @@ const HomePage = () => {
       <Divider />
 
       {/* ── TESTIMONIOS ── */}
-      <section id="testimonios" style={{ padding:'80px 48px', background:'#030810' }}>
+      <section id="testimonios" style={{ padding:'80px clamp(16px,5vw,48px)', background:'#030810' }}>
         <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
           <SectionHeader eyebrow="Testimonios" title="Lo que dicen" italic="nuestras clientas" />
         </motion.div>
         <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={stagger}
-          style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:2 }}>
+          style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap:2 }}>
           {testimonials.map(t => (
             <motion.div key={t.id} variants={fadeUp}>
               <TestimonialCard testimonial={t} />
@@ -223,7 +223,7 @@ const HomePage = () => {
       <Divider />
 
       {/* ── CONTACTO ── */}
-      <section id="contacto" style={{ padding:'80px 48px', background:'#000' }}>
+      <section id="contacto" style={{ padding:'80px clamp(16px,5vw,48px)', background:'#000' }}>
         <BookingForm services={services} />
       </section>
 

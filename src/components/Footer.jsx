@@ -5,9 +5,9 @@ const Footer = () => {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <footer style={{ background: '#020810', borderTop: '1px solid rgba(0,102,204,0.2)', padding: '56px 48px 28px' }}>
+    <footer style={{ background: '#020810', borderTop: '1px solid rgba(0,102,204,0.2)', padding: '48px clamp(16px,5vw,48px) 24px' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 'clamp(28px,4vw,48px)', marginBottom: 48 }}>
 
           {/* Brand */}
           <div>

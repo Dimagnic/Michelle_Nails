@@ -36,12 +36,12 @@ const Header = () => {
       borderBottom: isScrolled ? '1px solid rgba(0,102,204,0.25)' : 'none',
       backdropFilter: isScrolled ? 'blur(12px)' : 'none',
       transition: 'all 0.3s',
-      padding: '0 48px',
+      padding: '0 clamp(16px,5vw,48px)',
     }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo */}
         <button onClick={() => scrollTo('hero')} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, letterSpacing: 6, color: '#fff', fontWeight: 300 }}>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(15px,4vw,20px)', letterSpacing: 'clamp(3px,1.5vw,6px)', color: '#fff', fontWeight: 300 }}>
             MICHELLE <span style={{ color: '#3B9EFF' }}>NAILS</span>
           </span>
         </button>
@@ -71,14 +71,14 @@ const Header = () => {
         </nav>
 
         {/* Mobile toggle */}
-        <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', display: 'none' }} className="block md:hidden">
+        <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff' }} className="flex md:hidden">
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div style={{ background: 'rgba(0,0,0,0.98)', borderTop: '1px solid rgba(0,102,204,0.2)', padding: '24px 48px 32px' }}>
+        <div style={{ background: 'rgba(0,0,0,0.98)', borderTop: '1px solid rgba(0,102,204,0.2)', padding: '16px clamp(16px,5vw,48px) 24px' }}>
           {navLinks.map(l => (
             <button key={l.id} onClick={() => scrollTo(l.id)} style={{
               display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
