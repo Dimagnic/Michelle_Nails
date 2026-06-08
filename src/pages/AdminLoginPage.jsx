@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Lock } from 'lucide-react';
+import { Lock, ArrowLeft } from 'lucide-react';
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('');
@@ -34,6 +34,19 @@ const AdminLoginPage = () => {
 
   return (
     <div style={{ minHeight:'100vh', background:'#000', display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:"'Montserrat', sans-serif" }}>
+
+      {/* Botón volver */}
+      <button onClick={() => navigate('/')} style={{
+        position:'fixed', top:20, left:20,
+        display:'flex', alignItems:'center', gap:7,
+        background:'rgba(0,102,204,0.12)', border:'1px solid rgba(0,102,204,0.4)',
+        color:'#3B9EFF', padding:'9px 16px',
+        fontSize:11, letterSpacing:'1.5px', textTransform:'uppercase',
+        cursor:'pointer', fontFamily:"'Montserrat', sans-serif", borderRadius:2,
+        zIndex:10,
+      }}>
+        <ArrowLeft size={14}/> Volver
+      </button>
       <div style={{ position:'absolute', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle,rgba(0,102,204,0.1) 0%,transparent 70%)', top:'50%', left:'50%', transform:'translate(-50%,-50%)', pointerEvents:'none' }} />
       <div style={{ width:'100%', maxWidth:400, background:'#070d14', border:'1px solid rgba(0,102,204,0.2)', padding:44, position:'relative', zIndex:1 }}>
         <div style={{ textAlign:'center', marginBottom:36 }}>
