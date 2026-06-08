@@ -28,7 +28,7 @@ const GalleryCarousel = ({ images }) => {
 
   useEffect(() => {
     if (paused || lightbox !== null) { clearInterval(intervalRef.current); return; }
-    intervalRef.current = setInterval(next, 5000);
+    intervalRef.current = setInterval(next, 3000);
     return () => clearInterval(intervalRef.current);
   }, [paused, lightbox, next]);
 
@@ -220,7 +220,7 @@ const GalleryCarousel = ({ images }) => {
                 key={`${current}-${paused}`}
                 style={{
                   height: '100%', background: '#0066CC', borderRadius: 2,
-                  animation: paused ? 'none' : 'gc_progress 5s linear forwards',
+                  animation: paused ? 'none' : 'gc_progress 3s linear forwards',
                   width: '0%',
                 }}
               />
