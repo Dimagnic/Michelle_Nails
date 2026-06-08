@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LogOut, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,233 +10,188 @@ import { toast } from 'sonner';
 const AdminPanel = () => {
   const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
-  const [servicios, setServicios] = useState([]);
-  const [testimonios, setTestimonios] = useState([]);
-  const [galeria, setGaleria] = useState([]);
-  const [citas, setCitas] = useState([]);
+  const [data, setData] = useState({ servicios:[], testimonios:[], galeria:[], citas:[] });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadAllData();
-  }, []);
+  useEffect(() => { load(); }, []);
 
-  const loadAllData = async () => {
+  const load = async () => {
     try {
-      const [s, t, g, c] = await Promise.all([
+      const [s,t,g,c] = await Promise.all([
         supabase.from('servicios').select('*'),
         supabase.from('testimonios').select('*'),
         supabase.from('galeria').select('*').order('orden'),
-        supabase.from('citas').select('*').order('created_at', { ascending: false }),
+        supabase.from('citas').select('*').order('created_at', { ascending:false }),
       ]);
-      if (s.error) throw s.error;
-      if (t.error) throw t.error;
-      if (g.error) throw g.error;
-      if (c.error) throw c.error;
-      setServicios(s.data ?? []);
-      setTestimonios(t.data ?? []);
-      setGaleria(g.data ?? []);
-      setCitas(c.data ?? []);
-    } catch (error) {
-      toast.error('Error al cargar datos');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+      setData({ servicios:s.data||[], testimonios:t.data||[], galeria:g.data||[], citas:c.data||[] });
+    } catch { toast.error('Error al cargar datos'); }
+    finally { setLoading(false); }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
-
-  const deleteRow = async (table, id, setter, list) => {
+  const del = async (table, id, key) => {
     if (!window.confirm('¿Eliminar este registro?')) return;
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) { toast.error('Error al eliminar'); return; }
-    setter(list.filter(r => r.id !== id));
-    toast.success('Eliminado correctamente');
+    setData(p => ({ ...p, [key]: p[key].filter(r => r.id !== id) }));
+    toast.success('Eliminado');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Cargando panel...</p>
-        </div>
+  const cell = { fontSize:12, color:'rgba(255,255,255,0.75)', padding:'10px 14px' };
+  const head = { fontSize:10, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', padding:'10px 14px' };
+
+  if (loading) return (
+    <div style={{ minHeight:'100vh', background:'#000', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ textAlign:'center' }}>
+        <div style={{ width:48, height:48, border:'2px solid #0066CC', borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' }} />
+        <p style={{ fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'2px' }}>Cargando panel...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="bg-white border-b border-border sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-serif font-bold text-primary">Panel · Michelle Nails</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground hidden sm:block">{currentUser?.email}</span>
-            <Button onClick={handleLogout} variant="outline" size="sm">
-              <LogOut size={16} className="mr-2" />
-              Salir
-            </Button>
+    <div style={{ minHeight:'100vh', background:'#000', fontFamily:"'Montserrat', sans-serif" }}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+
+      <header style={{ background:'#070d14', borderBottom:'1px solid rgba(0,102,204,0.2)', position:'sticky', top:0, zIndex:10, padding:'0 32px' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', height:64, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:18, letterSpacing:5, color:'#fff', fontWeight:300 }}>
+            MICHELLE <span style={{ color:'#3B9EFF' }}>NAILS</span>
+            <span style={{ fontSize:10, letterSpacing:'2px', color:'rgba(255,255,255,0.3)', marginLeft:16, fontFamily:"'Montserrat', sans-serif" }}>PANEL ADMIN</span>
+          </span>
+          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+            <span style={{ fontSize:11, color:'rgba(255,255,255,0.35)' }}>{currentUser?.email}</span>
+            <button onClick={async () => { await logout(); navigate('/'); }} style={{
+              display:'flex', alignItems:'center', gap:6, background:'none',
+              border:'1px solid rgba(255,255,255,0.12)', color:'rgba(255,255,255,0.5)',
+              padding:'7px 16px', fontSize:11, letterSpacing:'1.5px', textTransform:'uppercase',
+              cursor:'pointer', fontFamily:"'Montserrat', sans-serif",
+            }}>
+              <LogOut size={13} /> Salir
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="citas" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="citas">Citas</TabsTrigger>
-            <TabsTrigger value="servicios">Servicios</TabsTrigger>
-            <TabsTrigger value="testimonios">Testimonios</TabsTrigger>
-            <TabsTrigger value="galeria">Galería</TabsTrigger>
+      <div style={{ maxWidth:1280, margin:'0 auto', padding:'32px' }}>
+        <Tabs defaultValue="citas">
+          <TabsList style={{ background:'#070d14', border:'1px solid rgba(0,102,204,0.2)', borderRadius:0, padding:4, marginBottom:24 }}>
+            {[['citas','Citas'],['servicios','Servicios'],['testimonios','Testimonios'],['galeria','Galería']].map(([v,l]) => (
+              <TabsTrigger key={v} value={v} style={{ fontFamily:"'Montserrat', sans-serif", fontSize:11, letterSpacing:'1.5px', textTransform:'uppercase', borderRadius:0 }}>{l}</TabsTrigger>
+            ))}
           </TabsList>
 
           {/* CITAS */}
           <TabsContent value="citas">
-            <Card>
-              <CardHeader><CardTitle>Citas ({citas.length})</CardTitle></CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nombre</TableHead>
-                        <TableHead>Teléfono</TableHead>
-                        <TableHead>Colonia</TableHead>
-                        <TableHead>Servicio</TableHead>
-                        <TableHead>Fecha</TableHead>
-                        <TableHead>Hora</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+            <div style={{ background:'#070d14', border:'1px solid rgba(0,102,204,0.15)' }}>
+              <div style={{ padding:'20px 24px', borderBottom:'1px solid rgba(255,255,255,0.05)', display:'flex', justifyContent:'space-between' }}>
+                <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:20, color:'#fff' }}>Citas</span>
+                <span style={{ fontSize:11, color:'#3B9EFF', letterSpacing:'1px' }}>{data.citas.length} registros</span>
+              </div>
+              <div style={{ overflowX:'auto' }}>
+                <Table>
+                  <TableHeader><TableRow style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                    {['Nombre','Teléfono','Colonia','Servicio','Fecha','Hora',''].map(h => <TableHead key={h} style={head}>{h}</TableHead>)}
+                  </TableRow></TableHeader>
+                  <TableBody>
+                    {data.citas.map(c => (
+                      <TableRow key={c.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+                        <TableCell style={cell}>{c.nombre}</TableCell>
+                        <TableCell style={cell}>{c.telefono}</TableCell>
+                        <TableCell style={cell}>{c.colonia}</TableCell>
+                        <TableCell style={cell}>{c.servicio}</TableCell>
+                        <TableCell style={cell}>{new Date(c.fecha).toLocaleDateString('es-MX')}</TableCell>
+                        <TableCell style={cell}>{c.hora}</TableCell>
+                        <TableCell style={cell}>
+                          <button onClick={() => del('citas', c.id, 'citas')} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(255,60,60,0.6)', padding:4 }}><Trash2 size={14} /></button>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {citas.map((cita) => (
-                        <TableRow key={cita.id}>
-                          <TableCell className="font-medium">{cita.nombre}</TableCell>
-                          <TableCell>{cita.telefono}</TableCell>
-                          <TableCell>{cita.colonia}</TableCell>
-                          <TableCell>{cita.servicio}</TableCell>
-                          <TableCell>{new Date(cita.fecha).toLocaleDateString('es-MX')}</TableCell>
-                          <TableCell>{cita.hora}</TableCell>
-                          <TableCell className="text-right">
-                            <Button onClick={() => deleteRow('citas', cita.id, setCitas, citas)}
-                              variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                              <Trash2 size={16} />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                {citas.length === 0 && <p className="text-center text-muted-foreground py-8">No hay citas registradas</p>}
-              </CardContent>
-            </Card>
+                    ))}
+                  </TableBody>
+                </Table>
+                {!data.citas.length && <p style={{ textAlign:'center', padding:40, fontSize:12, color:'rgba(255,255,255,0.25)', letterSpacing:'2px' }}>No hay citas registradas</p>}
+              </div>
+            </div>
           </TabsContent>
 
           {/* SERVICIOS */}
           <TabsContent value="servicios">
-            <Card>
-              <CardHeader><CardTitle>Servicios ({servicios.length})</CardTitle></CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nombre</TableHead>
-                        <TableHead>Descripción</TableHead>
-                        <TableHead>Precio</TableHead>
-                        <TableHead>Categoría</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+            <div style={{ background:'#070d14', border:'1px solid rgba(0,102,204,0.15)' }}>
+              <div style={{ padding:'20px 24px', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:20, color:'#fff' }}>Servicios</span>
+              </div>
+              <div style={{ overflowX:'auto' }}>
+                <Table>
+                  <TableHeader><TableRow style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                    {['Nombre','Descripción','Precio','Categoría',''].map(h => <TableHead key={h} style={head}>{h}</TableHead>)}
+                  </TableRow></TableHeader>
+                  <TableBody>
+                    {data.servicios.map(s => (
+                      <TableRow key={s.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+                        <TableCell style={cell}>{s.nombre}</TableCell>
+                        <TableCell style={{ ...cell, maxWidth:240 }}><span style={{ display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{s.descripcion}</span></TableCell>
+                        <TableCell style={{ ...cell, color:'#3B9EFF', fontFamily:"'Cormorant Garamond', serif", fontSize:16 }}>${s.precio}</TableCell>
+                        <TableCell style={cell}>{s.categoria}</TableCell>
+                        <TableCell style={cell}><button onClick={() => del('servicios', s.id, 'servicios')} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(255,60,60,0.6)', padding:4 }}><Trash2 size={14} /></button></TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {servicios.map((s) => (
-                        <TableRow key={s.id}>
-                          <TableCell className="font-medium">{s.nombre}</TableCell>
-                          <TableCell className="max-w-xs truncate">{s.descripcion}</TableCell>
-                          <TableCell>${s.precio}</TableCell>
-                          <TableCell>{s.categoria}</TableCell>
-                          <TableCell className="text-right">
-                            <Button onClick={() => deleteRow('servicios', s.id, setServicios, servicios)}
-                              variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                              <Trash2 size={16} />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                {servicios.length === 0 && <p className="text-center text-muted-foreground py-8">No hay servicios registrados</p>}
-              </CardContent>
-            </Card>
+                    ))}
+                  </TableBody>
+                </Table>
+                {!data.servicios.length && <p style={{ textAlign:'center', padding:40, fontSize:12, color:'rgba(255,255,255,0.25)', letterSpacing:'2px' }}>No hay servicios registrados</p>}
+              </div>
+            </div>
           </TabsContent>
 
           {/* TESTIMONIOS */}
           <TabsContent value="testimonios">
-            <Card>
-              <CardHeader><CardTitle>Testimonios ({testimonios.length})</CardTitle></CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nombre</TableHead>
-                        <TableHead>Colonia</TableHead>
-                        <TableHead>Calificación</TableHead>
-                        <TableHead>Texto</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+            <div style={{ background:'#070d14', border:'1px solid rgba(0,102,204,0.15)' }}>
+              <div style={{ padding:'20px 24px', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:20, color:'#fff' }}>Testimonios</span>
+              </div>
+              <div style={{ overflowX:'auto' }}>
+                <Table>
+                  <TableHeader><TableRow style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+                    {['Nombre','Colonia','Cal.','Testimonio',''].map(h => <TableHead key={h} style={head}>{h}</TableHead>)}
+                  </TableRow></TableHeader>
+                  <TableBody>
+                    {data.testimonios.map(t => (
+                      <TableRow key={t.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+                        <TableCell style={cell}>{t.nombre}</TableCell>
+                        <TableCell style={cell}>{t.colonia}</TableCell>
+                        <TableCell style={{ ...cell, color:'#3B9EFF' }}>{'★'.repeat(t.calificacion||5)}</TableCell>
+                        <TableCell style={{ ...cell, maxWidth:300 }}><span style={{ display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{t.texto}</span></TableCell>
+                        <TableCell style={cell}><button onClick={() => del('testimonios', t.id, 'testimonios')} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(255,60,60,0.6)', padding:4 }}><Trash2 size={14} /></button></TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {testimonios.map((t) => (
-                        <TableRow key={t.id}>
-                          <TableCell className="font-medium">{t.nombre}</TableCell>
-                          <TableCell>{t.colonia}</TableCell>
-                          <TableCell>{t.calificacion}/5 ⭐</TableCell>
-                          <TableCell className="max-w-xs truncate">{t.texto}</TableCell>
-                          <TableCell className="text-right">
-                            <Button onClick={() => deleteRow('testimonios', t.id, setTestimonios, testimonios)}
-                              variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                              <Trash2 size={16} />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                {testimonios.length === 0 && <p className="text-center text-muted-foreground py-8">No hay testimonios registrados</p>}
-              </CardContent>
-            </Card>
+                    ))}
+                  </TableBody>
+                </Table>
+                {!data.testimonios.length && <p style={{ textAlign:'center', padding:40, fontSize:12, color:'rgba(255,255,255,0.25)', letterSpacing:'2px' }}>No hay testimonios</p>}
+              </div>
+            </div>
           </TabsContent>
 
           {/* GALERÍA */}
           <TabsContent value="galeria">
-            <Card>
-              <CardHeader><CardTitle>Galería ({galeria.length} imágenes)</CardTitle></CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {galeria.map((item) => (
-                    <div key={item.id} className="relative group">
-                      <img src={item.foto_url} alt={item.categoria}
-                        className="w-full aspect-square object-cover rounded-lg" />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
-                        <Button onClick={() => deleteRow('galeria', item.id, setGaleria, galeria)}
-                          variant="destructive" size="sm">
-                          <Trash2 size={16} className="mr-2" />
-                          Eliminar
-                        </Button>
-                      </div>
-                      <p className="text-xs text-center mt-2 text-muted-foreground">{item.categoria}</p>
+            <div style={{ background:'#070d14', border:'1px solid rgba(0,102,204,0.15)', padding:24 }}>
+              <div style={{ marginBottom:20 }}><span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:20, color:'#fff' }}>Galería</span></div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))', gap:2 }}>
+                {data.galeria.map(item => (
+                  <div key={item.id} style={{ position:'relative', aspectRatio:'1' }}
+                    onMouseEnter={e => e.currentTarget.querySelector('.overlay').style.opacity=1}
+                    onMouseLeave={e => e.currentTarget.querySelector('.overlay').style.opacity=0}>
+                    <img src={item.foto_url} alt={item.categoria} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                    <div className="overlay" style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.7)', opacity:0, transition:'opacity 0.2s', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <button onClick={() => del('galeria', item.id, 'galeria')} style={{ background:'rgba(220,38,38,0.8)', border:'none', color:'#fff', padding:'8px 16px', fontSize:11, cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontFamily:"'Montserrat', sans-serif" }}>
+                        <Trash2 size={12} /> Eliminar
+                      </button>
                     </div>
-                  ))}
-                </div>
-                {galeria.length === 0 && <p className="text-center text-muted-foreground py-8">No hay imágenes en la galería</p>}
-              </CardContent>
-            </Card>
+                    <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'linear-gradient(transparent,rgba(0,0,0,0.8))', padding:'8px 10px' }}>
+                      <span style={{ fontSize:9, letterSpacing:'1.5px', color:'rgba(255,255,255,0.6)', textTransform:'uppercase' }}>{item.categoria}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {!data.galeria.length && <p style={{ textAlign:'center', padding:40, fontSize:12, color:'rgba(255,255,255,0.25)', letterSpacing:'2px' }}>No hay imágenes en la galería</p>}
+            </div>
           </TabsContent>
         </Tabs>
       </div>

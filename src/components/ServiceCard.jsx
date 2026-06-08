@@ -1,50 +1,39 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Sparkles } from 'lucide-react';
 
-const ServiceCard = ({ service, onBook }) => {
+const ServiceCard = ({ service, index, onBook }) => {
+  const num = String(index + 1).padStart(2, '0');
   return (
-    <Card className="overflow-hidden bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 h-full flex flex-col border-t-4 border-t-primary border-x-border border-b-border relative group">
-      
-      {/* Decorative accent */}
-      <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-        <Sparkles className="text-secondary/40" size={24} />
-      </div>
-
-      <div className="aspect-[4/3] overflow-hidden relative">
-        <img
-          src={service.image}
-          alt={service.nombre}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        {/* Subtle blue overlay on image */}
-        <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
-      </div>
-      
-      <CardContent className="p-6 flex-1 flex flex-col">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="text-xs font-semibold text-secondary uppercase tracking-wider bg-secondary/10 px-2 py-1 rounded-md">
-            {service.categoria}
-          </span>
+    <div
+      style={{
+        background: '#070d14',
+        padding: '36px 28px',
+        borderTop: index === 0 ? '2px solid #0066CC' : '2px solid transparent',
+        position: 'relative', overflow: 'hidden',
+        transition: 'all 0.3s', cursor: 'pointer', height: '100%',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderTopColor = '#0066CC'; e.currentTarget.style.background = '#0a1520'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderTopColor = index === 0 ? '#0066CC' : 'transparent'; e.currentTarget.style.background = '#070d14'; }}
+    >
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 52, fontWeight: 300, color: 'rgba(0,102,204,0.12)', lineHeight: 1, marginBottom: 14 }}>{num}</div>
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 21, fontWeight: 400, color: '#fff', marginBottom: 10, letterSpacing: '0.3px' }}>{service.nombre}</div>
+      <div style={{ fontSize: 11, lineHeight: 1.8, color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>{service.descripcion}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <div>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, color: '#fff' }}>${service.precio}</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginLeft: 4 }}>MXN</span>
         </div>
-        <h3 className="text-xl font-serif font-bold mb-3 text-primary group-hover:text-secondary transition-colors">{service.nombre}</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-1">{service.descripcion}</p>
-        <div className="flex items-baseline gap-1 mt-auto">
-          <span className="text-sm text-muted-foreground font-medium">Desde</span>
-          <span className="text-3xl font-bold text-secondary">${service.precio}</span>
-        </div>
-      </CardContent>
-      
-      <CardFooter className="p-6 pt-0">
-        <Button
+        <button
           onClick={() => onBook(service)}
-          className="w-full bg-primary text-white hover:bg-secondary transition-all duration-300 active:scale-[0.98] shadow-md shadow-primary/20"
-        >
-          Agendar Servicio
-        </Button>
-      </CardFooter>
-    </Card>
+          style={{
+            background: 'none', border: '1px solid rgba(0,102,204,0.4)', color: '#3B9EFF',
+            padding: '6px 16px', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase',
+            cursor: 'pointer', fontFamily: "'Montserrat', sans-serif", transition: 'all 0.2s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#0066CC'; e.currentTarget.style.color = '#fff'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#3B9EFF'; }}
+        >Agendar</button>
+      </div>
+    </div>
   );
 };
 

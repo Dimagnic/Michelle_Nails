@@ -1,196 +1,124 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
-import { Calendar, Clock, MapPin, User, Phone, MessageSquare } from 'lucide-react';
+import { MapPin, Clock, CheckCircle2 } from 'lucide-react';
 
-// Número de WhatsApp de Michelle (formato: 52 + 10 dígitos)
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '521234567890';
+const WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || '522221234567';
 
 const BookingForm = ({ services }) => {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    telefono: '',
-    colonia: '',
-    servicio: '',
-    fecha: '',
-    hora: '',
-    mensaje: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState({ nombre:'', telefono:'', colonia:'', servicio:'', fecha:'', hora:'', mensaje:'' });
+  const [submitting, setSubmitting] = useState(false);
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  const colonias = [
-    'Centro Histórico', 'Analco', 'La Paz', 'Xonaca',
-    'Hueyotlipan', 'San Manuel', 'Azcarate', 'Los Ángeles',
-    'Jardines de San Manuel', 'Otra colonia',
-  ];
-
-  const horarios = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM',
-  ];
-
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const colonias = ['Centro Histórico','Analco','La Paz','Xonaca','Hueyotlipan','San Manuel','Azcarate','Los Ángeles','Jardines de San Manuel','Angelópolis','Otra colonia'];
+  const horarios = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM'];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { nombre, telefono, colonia, servicio, fecha, hora } = formData;
+    const { nombre, telefono, colonia, servicio, fecha, hora } = form;
     if (!nombre || !telefono || !colonia || !servicio || !fecha || !hora) {
-      toast.error('Por favor completa todos los campos requeridos');
-      return;
+      toast.error('Por favor completa todos los campos requeridos'); return;
     }
-
-    setIsSubmitting(true);
-
+    setSubmitting(true);
     try {
-      const { error } = await supabase.from('citas').insert([formData]);
+      const { error } = await supabase.from('citas').insert([form]);
       if (error) throw error;
-
-      const msg = [
-        '*Nueva Cita - Michelle Nails*',
-        '',
-        `👤 *Nombre:* ${nombre}`,
-        `📱 *Teléfono:* ${telefono}`,
-        `📍 *Colonia:* ${colonia}`,
-        `💅 *Servicio:* ${servicio}`,
-        `📅 *Fecha:* ${fecha}`,
-        `⏰ *Hora:* ${hora}`,
-        formData.mensaje ? `💬 *Mensaje:* ${formData.mensaje}` : '',
-      ].filter(Boolean).join('\n');
-
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-
-      toast.success('¡Cita registrada! Te redirigimos a WhatsApp para confirmar.');
-      setFormData({ nombre: '', telefono: '', colonia: '', servicio: '', fecha: '', hora: '', mensaje: '' });
-    } catch (error) {
-      console.error(error);
-      toast.error('Hubo un error al registrar tu cita. Intenta de nuevo.');
+      const msg = [`*Nueva Cita - Michelle Nails*`, ``, `👤 *Nombre:* ${nombre}`, `📱 *Teléfono:* ${telefono}`, `📍 *Colonia:* ${colonia}`, `💅 *Servicio:* ${servicio}`, `📅 *Fecha:* ${fecha}`, `⏰ *Hora:* ${hora}`, form.mensaje ? `💬 *Mensaje:* ${form.mensaje}` : ''].filter(Boolean).join('\n');
+      window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+      toast.success('¡Cita registrada! Abriendo WhatsApp...');
+      setForm({ nombre:'', telefono:'', colonia:'', servicio:'', fecha:'', hora:'', mensaje:'' });
+    } catch (err) {
+      toast.error('Error al registrar. Intenta de nuevo.');
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
+  const labelStyle = { display: 'block', fontSize: 10, letterSpacing: '2px', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginBottom: 8 };
+  const inputStyle = { width: '100%', background: 'rgba(0,102,204,0.06)', border: '1px solid rgba(0,102,204,0.2)', padding: '12px 14px', color: '#fff', fontFamily: "'Montserrat', sans-serif", fontSize: 13, outline: 'none' };
+  const selectStyle = { ...inputStyle, appearance: 'none', cursor: 'pointer' };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-      {/* Info lateral */}
-      <div className="space-y-8">
-        <div>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-primary mb-4">
-            Agenda tu cita
-          </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Completa el formulario y te confirmaremos por WhatsApp. ¡Sin complicaciones!
-          </p>
-        </div>
-        <div className="space-y-5">
-          {[
-            { icon: MapPin, title: 'Servicio a domicilio', desc: 'Llegamos a donde estés en Puebla' },
-            { icon: Clock, title: 'Horarios flexibles', desc: 'Lunes a sábado de 9 AM a 6 PM' },
-            { icon: Calendar, title: 'Confirmación rápida', desc: 'Respuesta en menos de 2 horas' },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Icon className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground">{title}</h3>
-                <p className="text-muted-foreground text-sm">{desc}</p>
-              </div>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'start', maxWidth: 960, margin: '0 auto' }}>
+      {/* Info */}
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '4px', color: '#3B9EFF', textTransform: 'uppercase', marginBottom: 14 }}>Reservaciones</div>
+        <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 44, fontWeight: 300, color: '#fff', lineHeight: 1.15, marginBottom: 20 }}>
+          Agenda tu<br /><em style={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.6)' }}>cita ahora</em>
+        </h2>
+        <p style={{ fontSize: 12, lineHeight: 1.9, color: 'rgba(255,255,255,0.45)', marginBottom: 36 }}>
+          Completa el formulario y te confirmamos en menos de 2 horas por WhatsApp. Sin complicaciones.
+        </p>
+        {[
+          { icon: Clock, title: 'Horario flexible', desc: 'Lunes a sábado de 9 AM a 7 PM' },
+          { icon: MapPin, title: 'Toda Puebla', desc: 'Llegamos a tu colonia sin costo extra' },
+          { icon: CheckCircle2, title: 'Confirmación inmediata', desc: 'Respuesta garantizada en 2 horas' },
+        ].map(({ icon: Icon, title, desc }) => (
+          <div key={title} style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
+            <div style={{ width: 34, height: 34, border: '1px solid rgba(0,102,204,0.4)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon size={14} color="#3B9EFF" />
             </div>
-          ))}
-        </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: '#fff', marginBottom: 3 }}>{title}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', lineHeight: 1.6 }}>{desc}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Formulario */}
-      <Card className="shadow-xl shadow-primary/5 border-border">
-        <CardHeader>
-          <CardTitle className="font-serif text-xl text-primary">Datos de tu cita</CardTitle>
-          <CardDescription>Los campos marcados con * son obligatorios</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="nombre" className="flex items-center gap-1">
-                  <User size={14} /> Nombre *
-                </Label>
-                <Input id="nombre" placeholder="Tu nombre completo"
-                  value={formData.nombre} onChange={e => handleChange('nombre', e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="telefono" className="flex items-center gap-1">
-                  <Phone size={14} /> Teléfono *
-                </Label>
-                <Input id="telefono" placeholder="222 123 4567" type="tel"
-                  value={formData.telefono} onChange={e => handleChange('telefono', e.target.value)} required />
-              </div>
-            </div>
+      {/* Form */}
+      <div style={{ background: '#070d14', border: '1px solid rgba(0,102,204,0.2)', padding: 36 }}>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <div><label style={labelStyle}>Nombre *</label><input style={inputStyle} placeholder="Tu nombre" value={form.nombre} onChange={e => set('nombre', e.target.value)} required /></div>
+            <div><label style={labelStyle}>Teléfono *</label><input style={inputStyle} placeholder="222 000 0000" value={form.telefono} onChange={e => set('telefono', e.target.value)} required /></div>
+          </div>
 
-            <div className="space-y-2">
-              <Label className="flex items-center gap-1"><MapPin size={14} /> Colonia *</Label>
-              <Select value={formData.colonia} onValueChange={v => handleChange('colonia', v)} required>
-                <SelectTrigger><SelectValue placeholder="Selecciona tu colonia" /></SelectTrigger>
-                <SelectContent>
-                  {colonias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>Servicio *</label>
+            <select style={selectStyle} value={form.servicio} onChange={e => set('servicio', e.target.value)} required>
+              <option value="" style={{ background: '#070d14' }}>Selecciona un servicio</option>
+              {services.map(s => <option key={s.id} value={s.nombre} style={{ background: '#070d14' }}>{s.nombre} — ${s.precio}</option>)}
+            </select>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Servicio *</Label>
-              <Select value={formData.servicio} onValueChange={v => handleChange('servicio', v)} required>
-                <SelectTrigger><SelectValue placeholder="¿Qué servicio deseas?" /></SelectTrigger>
-                <SelectContent>
-                  {services.map(s => (
-                    <SelectItem key={s.id} value={s.nombre}>{s.nombre} — ${s.precio}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+            <div>
+              <label style={labelStyle}>Fecha *</label>
+              <input style={inputStyle} type="date" min={new Date().toISOString().split('T')[0]} value={form.fecha} onChange={e => set('fecha', e.target.value)} required />
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="fecha" className="flex items-center gap-1">
-                  <Calendar size={14} /> Fecha *
-                </Label>
-                <Input id="fecha" type="date"
-                  min={new Date().toISOString().split('T')[0]}
-                  value={formData.fecha} onChange={e => handleChange('fecha', e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label className="flex items-center gap-1"><Clock size={14} /> Hora *</Label>
-                <Select value={formData.hora} onValueChange={v => handleChange('hora', v)} required>
-                  <SelectTrigger><SelectValue placeholder="Horario" /></SelectTrigger>
-                  <SelectContent>
-                    {horarios.map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div>
+              <label style={labelStyle}>Hora *</label>
+              <select style={selectStyle} value={form.hora} onChange={e => set('hora', e.target.value)} required>
+                <option value="" style={{ background: '#070d14' }}>Selecciona horario</option>
+                {horarios.map(h => <option key={h} value={h} style={{ background: '#070d14' }}>{h}</option>)}
+              </select>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="mensaje" className="flex items-center gap-1">
-                <MessageSquare size={14} /> Notas adicionales
-              </Label>
-              <Textarea id="mensaje" placeholder="Diseño especial, alergias, instrucciones de acceso..."
-                rows={3} value={formData.mensaje} onChange={e => handleChange('mensaje', e.target.value)} />
-            </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>Colonia *</label>
+            <select style={selectStyle} value={form.colonia} onChange={e => set('colonia', e.target.value)} required>
+              <option value="" style={{ background: '#070d14' }}>Tu colonia en Puebla</option>
+              {colonias.map(c => <option key={c} value={c} style={{ background: '#070d14' }}>{c}</option>)}
+            </select>
+          </div>
 
-            <Button type="submit" disabled={isSubmitting}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base font-semibold rounded-full transition-all duration-300 active:scale-[0.98]">
-              {isSubmitting ? 'Registrando...' : '💅 Confirmar cita por WhatsApp'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          <div style={{ marginBottom: 24 }}>
+            <label style={labelStyle}>Notas adicionales</label>
+            <textarea style={{ ...inputStyle, resize: 'none' }} rows={3} placeholder="Diseño especial, alergias, instrucciones..." value={form.mensaje} onChange={e => set('mensaje', e.target.value)} />
+          </div>
+
+          <button type="submit" disabled={submitting} style={{
+            width: '100%', background: 'linear-gradient(135deg,#0052A3,#0066CC)', color: '#fff', border: 'none',
+            padding: 16, fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase',
+            cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: "'Montserrat', sans-serif",
+            opacity: submitting ? 0.7 : 1, transition: 'all 0.2s',
+          }}>
+            {submitting ? 'Registrando...' : 'Confirmar por WhatsApp'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -1,53 +1,28 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Star, Quote } from 'lucide-react';
 
 const TestimonialCard = ({ testimonial }) => {
+  const initials = testimonial.nombre.split(' ').map(w => w[0]).slice(0,2).join('');
   return (
-    <Card className="h-full bg-white border-none shadow-md hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 relative overflow-hidden group">
-      {/* Left blue accent line */}
-      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-michelle"></div>
-      
-      <CardContent className="p-8">
-        <Quote className="text-accent absolute top-6 right-6 w-12 h-12 opacity-50 -rotate-12 group-hover:scale-110 transition-transform duration-300" />
-        
-        <div className="flex items-center gap-4 mb-6 relative z-10">
-          <div className="w-16 h-16 rounded-full overflow-hidden bg-accent flex-shrink-0 border-2 border-secondary p-0.5">
-            <div className="w-full h-full rounded-full overflow-hidden">
-              {testimonial.foto ? (
-                <img
-                  src={testimonial.foto}
-                  alt={testimonial.nombre}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary/5 text-primary font-serif font-bold text-xl">
-                  {testimonial.nombre.charAt(0)}
-                </div>
-              )}
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold text-primary text-lg">{testimonial.nombre}</h4>
-            <p className="text-sm text-secondary font-medium">{testimonial.colonia}</p>
-          </div>
+    <div style={{ background: '#070d14', padding: '36px 28px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
+        {Array(testimonial.calificacion || 5).fill(0).map((_, i) => (
+          <div key={i} style={{ width: 12, height: 12, background: '#0066CC', clipPath: 'polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)' }} />
+        ))}
+      </div>
+      <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 17, fontStyle: 'italic', lineHeight: 1.75, color: 'rgba(255,255,255,0.75)', marginBottom: 28, flex: 1 }}>
+        "{testimonial.texto}"
+      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+        {testimonial.foto
+          ? <img src={testimonial.foto} alt={testimonial.nombre} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover' }} />
+          : <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#0052A3,#3B9EFF)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500, color: '#fff' }}>{initials}</div>
+        }
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 500, color: '#fff', letterSpacing: '0.5px' }}>{testimonial.nombre}</div>
+          <div style={{ fontSize: 10, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginTop: 2 }}>{testimonial.colonia}</div>
         </div>
-        
-        <div className="flex gap-1 mb-4">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={18}
-              className={i < testimonial.calificacion ? 'fill-secondary text-secondary' : 'text-muted'}
-            />
-          ))}
-        </div>
-        
-        <p className="text-base leading-relaxed text-foreground/80 relative z-10 font-serif italic">
-          "{testimonial.texto}"
-        </p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

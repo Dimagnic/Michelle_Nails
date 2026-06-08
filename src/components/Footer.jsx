@@ -1,100 +1,72 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react';
+import { Instagram, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
+  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+
   return (
-    <footer className="bg-primary text-primary-foreground py-16 border-t-[6px] border-secondary">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8">
-          
-          {/* Brand Info */}
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-white p-2 rounded-xl shadow-md">
-                <img 
-                  src="https://horizons-cdn.hostinger.com/2448214a-3cb0-469a-9b08-1f82454a803c/b5700194d93d06eb3396d3b3649fe904.png" 
-                  alt="Michelle Nails Logo" 
-                  className="h-10 w-10 object-contain"
-                />
-              </div>
-              <h3 className="text-2xl font-serif font-bold tracking-wide">Michelle Nails</h3>
+    <footer style={{ background: '#020810', borderTop: '1px solid rgba(0,102,204,0.2)', padding: '56px 48px 28px' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
+
+          {/* Brand */}
+          <div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, letterSpacing: 6, color: '#fff', fontWeight: 300, marginBottom: 14 }}>
+              MICHELLE <span style={{ color: '#3B9EFF' }}>NAILS</span>
             </div>
-            <p className="text-primary-foreground/90 font-medium mb-4 text-lg">
-              Servicio a domicilio · Belleza en tus manos
-            </p>
-            <p className="text-sm text-primary-foreground/80 leading-relaxed max-w-sm">
-              Brindamos servicios de manicura y pedicura profesional directamente en la comodidad de tu hogar, utilizando productos de la más alta calidad y garantizando una experiencia vibrante.
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.8, letterSpacing: '0.3px' }}>
+              Servicio de manicure y pedicure<br />
+              premium a domicilio en Puebla.<br />
+              Porque la belleza llega a ti.
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Nav */}
           <div>
-            <h4 className="font-serif font-semibold text-lg mb-6 text-white border-b border-white/20 pb-2 inline-block">Enlaces Rápidos</h4>
-            <ul className="space-y-3">
-              {['Servicios', 'Galería', 'Testimonios', 'Contacto'].map((link) => (
-                <li key={link}>
-                  <a href={`#${link.toLowerCase()}`} className="text-sm text-primary-foreground/80 hover:text-white transition-colors duration-200 flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-secondary group-hover:scale-150 transition-transform"></span>
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div style={{ fontSize: 10, letterSpacing: '3px', color: '#3B9EFF', textTransform: 'uppercase', marginBottom: 18 }}>Navegación</div>
+            {[['Servicios','servicios'],['Galería','galeria'],['Testimonios','testimonios'],['Agendar cita','contacto']].map(([label, id]) => (
+              <button key={id} onClick={() => scrollTo(id)} style={{
+                display: 'block', background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 10,
+                fontFamily: "'Montserrat', sans-serif", textAlign: 'left',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.target.style.color = '#fff'}
+              onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.4)'}
+              >{label}</button>
+            ))}
           </div>
 
-          {/* Contact Info */}
+          {/* Contact */}
           <div>
-            <h4 className="font-serif font-semibold text-lg mb-6 text-white border-b border-white/20 pb-2 inline-block">Contacto</h4>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm text-primary-foreground/90 hover:text-white transition-colors duration-200">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <Phone size={14} />
-                </div>
-                <a href="tel:+525522203914838">+52 222 123 4567</a>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-primary-foreground/90 hover:text-white transition-colors duration-200">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <Mail size={14} />
-                </div>
-                <a href="mailto:hola@michellenails.com">hola@michellenails.com</a>
-              </div>
-              <div className="flex items-start gap-3 text-sm text-primary-foreground/90">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <MapPin size={14} />
-                </div>
-                <span>Servicio a domicilio en Ciudad de México y área metropolitana</span>
-              </div>
-            </div>
-            
-            <div className="flex gap-3 mt-8">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-white transition-all duration-300"
-                aria-label="Instagram"
-              >
-                <Instagram size={18} />
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-white transition-all duration-300"
-                aria-label="Facebook"
-              >
-                <Facebook size={18} />
-              </a>
+            <div style={{ fontSize: 10, letterSpacing: '3px', color: '#3B9EFF', textTransform: 'uppercase', marginBottom: 18 }}>Contacto</div>
+            <a href="https://wa.me/522221234567" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 12, textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color='#fff'}
+              onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.4)'}>
+              <MessageCircle size={14} color="#0066CC" /> WhatsApp directo
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 12, textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color='#fff'}
+              onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.4)'}>
+              <Instagram size={14} color="#0066CC" /> @michelle.nails
+            </a>
+            <div style={{ marginTop: 20, fontSize: 11, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.5px', lineHeight: 1.7 }}>
+              Lunes – Sábado<br />9:00 AM – 7:00 PM
             </div>
           </div>
-
         </div>
 
-        <div className="mt-16 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
-          <p>&copy; {new Date().getFullYear()} Michelle Nails. Todos los derechos reservados.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Política de Privacidad</a>
-            <a href="#" className="hover:text-white transition-colors">Términos de Servicio</a>
+        {/* Bottom */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', letterSpacing: '1px' }}>
+            © 2026 Michelle Nails · Puebla, México
+          </span>
+          <div style={{ display: 'flex', gap: 12 }}>
+            {[MessageCircle, Instagram].map((Icon, i) => (
+              <div key={i} style={{ width: 32, height: 32, border: '1px solid rgba(0,102,204,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <Icon size={13} color="rgba(255,255,255,0.4)" />
+              </div>
+            ))}
           </div>
         </div>
       </div>

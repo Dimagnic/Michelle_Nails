@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
 import { motion } from 'framer-motion';
-import { MapPin, CheckCircle2, Sparkles, MessageCircle, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MessageCircle, Sparkles, MapPin, CheckCircle2, Heart } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ServiceCard from '@/components/ServiceCard';
@@ -12,447 +10,239 @@ import TestimonialCard from '@/components/TestimonialCard';
 import BookingForm from '@/components/BookingForm';
 import { supabase } from '@/lib/supabaseClient';
 
-const HomePage = () => {
-  const [galleryImages, setGalleryImages] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('Todos');
-  const [testimonials, setTestimonials] = useState([]);
-  const [services, setServices] = useState([]);
+const WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || '522221234567';
 
-  useEffect(() => {
-    loadData();
-  }, []);
+const defaultServices = [
+  { id:'1', nombre:'Acrílico Escultural', descripcion:'Extensiones con acrílico premium. Diseño personalizado y acabado impecable que dura semanas.', precio:550, categoria:'Acrílicas', image:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400' },
+  { id:'2', nombre:'Gel Semipermanente', descripcion:'Manicura completa con gel de alta calidad. Brillo espejo y duración hasta 4 semanas sin astillarse.', precio:380, categoria:'Gel', image:'https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=400' },
+  { id:'3', nombre:'Nail Art & Diseños', descripcion:'Arte a mano alzada, cristales Swarovski, cromados, encapsulados y efectos únicos para cada ocasión.', precio:250, categoria:'Nail Art', image:'https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=400' },
+  { id:'4', nombre:'Spa Pedicure', descripcion:'Experiencia de spa completa. Exfoliación, masaje relajante y esmaltado perfecto para tus pies.', precio:450, categoria:'Pedicure', image:'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=400' },
+];
+const defaultGallery = [
+  { id:'1', image:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600', categoria:'Acrílicas' },
+  { id:'2', image:'https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600', categoria:'Gel' },
+  { id:'3', image:'https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600', categoria:'Nail Art' },
+  { id:'4', image:'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600', categoria:'Pedicure' },
+  { id:'5', image:'https://images.unsplash.com/photo-1599948128020-9a44e4a3f1e1?w=600', categoria:'Acrílicas' },
+  { id:'6', image:'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600', categoria:'Gel' },
+];
+const defaultTestimonials = [
+  { id:'1', nombre:'Ana Sofía M.', colonia:'Angelópolis', calificacion:5, texto:'El servicio a domicilio es increíble. Llegaron puntualísimas, traían todo esterilizado y mis uñas quedaron espectaculares.' },
+  { id:'2', nombre:'Valeria R.', colonia:'La Paz', calificacion:5, texto:'El gel me dura casi un mes intacto. La calidad y el diseño son de otro nivel. ¡Ya no voy a ningún otro salón!' },
+  { id:'3', nombre:'Daniela M.', colonia:'San Manuel', calificacion:5, texto:'La higiene y profesionalismo son impecables. Me hice el spa pedicure en casa y fue la experiencia más relajante.' },
+];
+
+const fadeUp = { hidden:{ opacity:0, y:28 }, show:{ opacity:1, y:0, transition:{ duration:0.7 } } };
+const stagger = { hidden:{}, show:{ transition:{ staggerChildren:0.1 } } };
+
+const Divider = () => (
+  <div style={{ display:'flex', alignItems:'center', gap:16, padding:'28px 48px', background:'#000' }}>
+    <div style={{ flex:1, height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.4),transparent)' }} />
+    <div style={{ width:6, height:6, background:'#0066CC', transform:'rotate(45deg)', flexShrink:0 }} />
+    <div style={{ flex:1, height:1, background:'linear-gradient(90deg,rgba(0,102,204,0.4),transparent)' }} />
+  </div>
+);
+
+const SectionHeader = ({ eyebrow, title, italic }) => (
+  <div style={{ textAlign:'center', marginBottom:52 }}>
+    <div style={{ fontSize:10, letterSpacing:'4px', color:'#3B9EFF', textTransform:'uppercase', marginBottom:14 }}>{eyebrow}</div>
+    <h2 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:42, fontWeight:300, color:'#fff', lineHeight:1.2 }}>
+      {title} <em style={{ fontStyle:'italic', color:'rgba(255,255,255,0.5)' }}>{italic}</em>
+    </h2>
+  </div>
+);
+
+const HomePage = () => {
+  const [services, setServices] = useState([]);
+  const [gallery, setGallery] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('Todos');
+
+  useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
-      const [{ data: serviciosData }, { data: galeriaData }, { data: testimoniosData }] = await Promise.all([
+      const [{ data: svc }, { data: gal }, { data: test }] = await Promise.all([
         supabase.from('servicios').select('*'),
         supabase.from('galeria').select('*').order('orden'),
         supabase.from('testimonios').select('*'),
       ]);
-
-      const serviciosWithImages = (serviciosData || []).map((s, index) => ({
-        id: s.id,
-        nombre: s.nombre,
-        descripcion: s.descripcion,
-        precio: s.precio,
-        categoria: s.categoria,
-        image: s.foto_url || defaultServiceImages[index] || defaultServiceImages[0],
-      }));
-
-      const galeriaWithUrls = (galeriaData || []).map(g => ({
-        id: g.id,
-        image: g.foto_url,
-        categoria: g.categoria,
-      }));
-
-      const testimoniosWithUrls = (testimoniosData || []).map(t => ({
-        id: t.id,
-        nombre: t.nombre,
-        colonia: t.colonia,
-        foto: t.foto_url || null,
-        calificacion: t.calificacion,
-        texto: t.texto,
-      }));
-
-      setServices(serviciosWithImages.length > 0 ? serviciosWithImages : defaultServices);
-      setGalleryImages(galeriaWithUrls.length > 0 ? galeriaWithUrls : defaultGallery);
-      setTestimonials(testimoniosWithUrls.length > 0 ? testimoniosWithUrls : defaultTestimonials);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      setServices(defaultServices);
-      setGalleryImages(defaultGallery);
-      setTestimonials(defaultTestimonials);
+      setServices(svc?.length ? svc.map((s,i) => ({ ...s, image: s.foto_url || defaultServices[i]?.image || defaultServices[0].image })) : defaultServices);
+      setGallery(gal?.length ? gal.map(g => ({ ...g, image: g.foto_url })) : defaultGallery);
+      setTestimonials(test?.length ? test.map(t => ({ ...t, foto: t.foto_url || null })) : defaultTestimonials);
+    } catch {
+      setServices(defaultServices); setGallery(defaultGallery); setTestimonials(defaultTestimonials);
     }
   };
 
-  const defaultServiceImages = [
-    'https://images.unsplash.com/photo-1653058697255-4234cec16e52',
-    'https://images.unsplash.com/photo-1700760933910-d3c03aa18b65',
-    'https://images.unsplash.com/photo-1687723977270-4f86dbda39e6',
-    'https://images.unsplash.com/photo-1633955726992-2b7c0d2d2a69'
-  ];
-
-  const defaultServices = [
-    {
-      id: '1',
-      nombre: 'Acrílico Escultural',
-      descripcion: 'Extensión de uñas con acrílico de alta calidad, diseño personalizado y acabado impecable.',
-      precio: 550,
-      categoria: 'Acrílicas',
-      image: defaultServiceImages[0]
-    },
-    {
-      id: '2',
-      nombre: 'Gel Semipermanente',
-      descripcion: 'Manicura completa con esmaltado en gel que asegura un brillo perfecto y duradero.',
-      precio: 380,
-      categoria: 'Gel',
-      image: defaultServiceImages[1]
-    },
-    {
-      id: '3',
-      nombre: 'Nail Art & Diseños',
-      descripcion: 'Diseños artísticos a mano alzada, cristalería, efectos cromados y encapsulados.',
-      precio: 250,
-      categoria: 'Nail Art',
-      image: defaultServiceImages[2]
-    },
-    {
-      id: '4',
-      nombre: 'Spa Pedicure',
-      descripcion: 'Cuidado profundo para tus pies, incluyendo exfoliación, masaje y esmaltado perfecto.',
-      precio: 450,
-      categoria: 'Pedicure',
-      image: defaultServiceImages[3]
-    }
-  ];
-
-  const defaultGallery = [
-    { id: '1', image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371', categoria: 'Acrílicas' },
-    { id: '2', image: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc', categoria: 'Gel' },
-    { id: '3', image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53', categoria: 'Nail Art' },
-    { id: '4', image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b', categoria: 'Pedicure' },
-    { id: '5', image: 'https://images.unsplash.com/photo-1599948128020-9a44e4a3f1e1', categoria: 'Acrílicas' },
-    { id: '6', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e', categoria: 'Gel' }
-  ];
-
-  const defaultTestimonials = [
-    {
-      id: '1',
-      nombre: 'Ana Sofía',
-      colonia: 'Polanco',
-      foto: null,
-      calificacion: 5,
-      texto: 'El servicio a domicilio de Michelle Nails es increíble. Llegaron súper puntuales, traían todo esterilizado y mis uñas de acrílico quedaron espectaculares.'
-    },
-    {
-      id: '2',
-      nombre: 'Valeria R.',
-      colonia: 'Condesa',
-      foto: null,
-      calificacion: 5,
-      texto: 'Me fascina su trabajo. El gel me dura intacto por casi un mes. ¡Súper recomendadas para cuando no tienes tiempo de ir a un salón!'
-    },
-    {
-      id: '3',
-      nombre: 'Daniela M.',
-      colonia: 'Roma Norte',
-      foto: null,
-      calificacion: 5,
-      texto: 'La higiene y profesionalismo son de otro nivel. Me hice un pedicure spa en la sala de mi casa y fue de lo más relajante.'
-    }
-  ];
-
-  const categories = ['Todos', ...new Set(galleryImages.map(img => img.categoria))];
-  
-  const filteredGallery = activeCategory === 'Todos'
-    ? galleryImages
-    : galleryImages.filter(img => img.categoria === activeCategory);
-
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleBookService = (service) => {
-    scrollToSection('contacto');
-  };
-
-  const openWhatsApp = (message) => {
-    window.open(`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '521234567890'}?text=${encodeURIComponent(message)}`, '_blank');
-  };
+  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior:'smooth' });
+  const categories = ['Todos', ...new Set(gallery.map(g => g.categoria))];
+  const filtered = activeCategory === 'Todos' ? gallery : gallery.filter(g => g.categoria === activeCategory);
 
   return (
-    <>
+    <div style={{ background:'#000', minHeight:'100vh' }}>
       <Header />
 
+      {/* WhatsApp FAB */}
       <button
-        onClick={() => openWhatsApp('Hola Michelle Nails, me gustaría agendar una cita para arreglar mis uñas')}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+        onClick={() => window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola Michelle Nails, me gustaría agendar una cita 💅')}`, '_blank')}
         aria-label="Contactar por WhatsApp"
-      >
-        <MessageCircle size={24} />
+        style={{
+          position:'fixed', bottom:28, right:28, zIndex:40,
+          width:52, height:52, borderRadius:'50%',
+          background:'linear-gradient(135deg,#0052A3,#0080FF)',
+          border:'none', cursor:'pointer',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          boxShadow:'0 4px 20px rgba(0,102,204,0.5)',
+          animation:'pulse-blue 2.5s infinite',
+        }}>
+        <MessageCircle size={22} color="#fff" fill="#fff" />
       </button>
 
-      <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1460980445968-0a5d622f295b"
-            alt="Michelle Nails Manicure"
-            className="w-full h-full object-cover mix-blend-overlay opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-michelle opacity-90"></div>
-        </div>
+      {/* ── HERO ── */}
+      <section id="hero" style={{ minHeight:'100vh', background:'linear-gradient(180deg,#000 0%,#010d1a 50%,#011833 100%)', display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'100px 48px 80px', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(0,102,204,0.16) 0%,transparent 70%)', top:'50%', left:'50%', transform:'translate(-50%,-50%)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', width:350, height:350, borderRadius:'50%', background:'radial-gradient(circle,rgba(59,158,255,0.08) 0%,transparent 70%)', top:'25%', right:'8%', pointerEvents:'none' }} />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="mb-6 flex justify-center"
-          >
-            <div className="bg-white/20 p-4 rounded-full backdrop-blur-sm border border-white/30 shadow-lg">
-              <Sparkles className="w-10 h-10 text-white" />
-            </div>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 leading-tight drop-shadow-xl"
-          >
-            Bienvenida a Michelle Nails
-          </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-3xl mb-10 text-white/90 font-light tracking-wide drop-shadow-md"
-          >
-            Servicio a domicilio · Belleza en tus manos
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <Button
-              onClick={() => scrollToSection('contacto')}
-              size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/50 text-lg px-10 py-7 rounded-full transition-all duration-300 active:scale-95 shadow-lg border border-white/20 font-semibold"
-            >
-              Agenda tu cita hoy
-            </Button>
+        <div style={{ position:'relative', zIndex:2, maxWidth:780 }}>
+          <motion.div initial="hidden" animate="show" variants={stagger}>
+            <motion.div variants={fadeUp}>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:8, border:'1px solid rgba(59,158,255,0.4)', padding:'7px 20px', fontSize:10, letterSpacing:'3px', color:'#3B9EFF', textTransform:'uppercase', marginBottom:28 }}>
+                <div style={{ width:4, height:4, borderRadius:'50%', background:'#3B9EFF' }} />
+                Servicio Premium a Domicilio · Puebla
+              </div>
+            </motion.div>
+            <motion.h1 variants={fadeUp} style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'clamp(52px,8vw,80px)', fontWeight:300, lineHeight:1.05, letterSpacing:2, marginBottom:12, color:'#fff' }}>
+              Belleza que<br /><em style={{ fontStyle:'italic', color:'#3B9EFF' }}>llega a ti</em>
+            </motion.h1>
+            <motion.p variants={fadeUp} style={{ fontSize:11, letterSpacing:'4px', color:'rgba(255,255,255,0.4)', textTransform:'uppercase', marginBottom:40 }}>
+              Uñas Acrílicas · Gel · Nail Art · Pedicure Spa
+            </motion.p>
+            <motion.div variants={fadeUp} style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+              <button className="mn-btn-primary" onClick={() => scrollTo('contacto')}>Agenda tu cita</button>
+              <button className="mn-btn-ghost" onClick={() => scrollTo('galeria')}>Ver trabajos</button>
+            </motion.div>
+            <motion.div variants={fadeUp} style={{ display:'flex', gap:48, justifyContent:'center', marginTop:60, paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.07)', flexWrap:'wrap' }}>
+              {[['500+','Clientas felices'],['3+','Años de experiencia'],['100%','Materiales premium']].map(([num, label]) => (
+                <div key={label} style={{ textAlign:'center' }}>
+                  <div style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:38, fontWeight:300, color:'#fff', lineHeight:1 }}>
+                    {num.replace(/[^0-9]/g, '')}<span style={{ color:'#3B9EFF' }}>{num.replace(/[0-9]/g, '')}</span>
+                  </div>
+                  <div style={{ fontSize:10, letterSpacing:'2px', color:'rgba(255,255,255,0.35)', textTransform:'uppercase', marginTop:6 }}>{label}</div>
+                </div>
+              ))}
+            </motion.div>
           </motion.div>
         </div>
-        
+
         {/* Scroll indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
-        >
-          <span className="text-white/80 text-sm tracking-widest uppercase font-medium">Descubre</span>
-          <div className="w-[2px] h-12 bg-white/20 overflow-hidden rounded-full">
-            <div className="w-full h-1/2 bg-white animate-[slideDown_2s_ease-in-out_infinite]"></div>
+        <div style={{ position:'absolute', bottom:36, left:'50%', transform:'translateX(-50%)', display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
+          <span style={{ fontSize:9, letterSpacing:'3px', color:'rgba(255,255,255,0.3)', textTransform:'uppercase' }}>Descubre</span>
+          <div style={{ width:1, height:48, background:'rgba(255,255,255,0.1)', overflow:'hidden', borderRadius:4 }}>
+            <div style={{ width:'100%', height:'50%', background:'rgba(0,102,204,0.7)', animation:'slideDown 2s ease-in-out infinite' }} />
           </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* ── SERVICIOS ── */}
+      <section id="servicios" style={{ padding:'80px 48px', background:'#000' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
+          <SectionHeader eyebrow="Nuestros servicios" title="Diseñado para" italic="realzar tu belleza" />
+        </motion.div>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={stagger}
+          style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:2 }}>
+          {services.map((s, i) => (
+            <motion.div key={s.id} variants={fadeUp}>
+              <ServiceCard service={s} index={i} onBook={() => scrollTo('contacto')} />
+            </motion.div>
+          ))}
+        </motion.div>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
+          <ServiceCalculator services={services} />
         </motion.div>
       </section>
 
-      <section id="servicios" className="py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-primary drop-shadow-sm">
-              En Michelle Nails ofrecemos...
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Descubre nuestra selección de servicios diseñados para realzar tu belleza sin salir de casa.
-            </p>
-          </motion.div>
+      <Divider />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {services.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="h-full"
-              >
-                <ServiceCard service={service} onBook={handleBookService} />
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl mx-auto"
-          >
-            <ServiceCalculator services={services} />
-          </motion.div>
+      {/* ── PROCESO ── */}
+      <section id="como-funciona" style={{ padding:'80px 48px', background:'#030810' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
+          <SectionHeader eyebrow="Cómo funciona" title="Tu experiencia" italic="sin complicaciones" />
+        </motion.div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:0, maxWidth:900, margin:'0 auto', position:'relative' }}>
+          <div style={{ position:'absolute', top:28, left:'16%', right:'16%', height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.5),rgba(59,158,255,0.5),rgba(0,102,204,0.5),transparent)' }} />
+          {[
+            { num:'1', title:'Elige y agenda', desc:'Selecciona tu servicio y reserva tu cita desde la web o WhatsApp en menos de 2 minutos.' },
+            { num:'2', title:'Confirmación', desc:'Recibes confirmación inmediata. Te recordamos 24 horas antes de tu cita.' },
+            { num:'3', title:'Llegamos a ti', desc:'Tu manicurista llega puntual con todo el equipo esterilizado. Tú solo disfrutas.' },
+          ].map((step, i) => (
+            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}
+              style={{ textAlign:'center', padding:'0 28px' }}>
+              <div style={{ width:56, height:56, border:'1px solid rgba(0,102,204,0.45)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px', background:'#000', position:'relative', zIndex:1 }}>
+                <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:22, fontWeight:300, color:'#3B9EFF' }}>{step.num}</span>
+              </div>
+              <h3 style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:21, fontWeight:400, color:'#fff', marginBottom:10 }}>{step.title}</h3>
+              <p style={{ fontSize:11, lineHeight:1.8, color:'rgba(255,255,255,0.42)' }}>{step.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      <section id="como-funciona" className="py-24 bg-accent/50 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-secondary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
+      <Divider />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-primary">
-              Con Michelle Nails es fácil...
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              El proceso perfecto para que disfrutes de una experiencia relajante en tu propio espacio.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-            {/* Connecting line for desktop */}
-            <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-[2px] bg-border border-dashed border-2 border-primary/30"></div>
-
-            {[
-              {
-                icon: Heart,
-                title: 'Eliges lo que amas',
-                description: 'Revisa nuestra galería, escoge el servicio y diseño vibrante que más te guste.'
-              },
-              {
-                icon: CheckCircle2,
-                title: 'Agendas fácilmente',
-                description: 'Completa nuestro formulario o envíanos un WhatsApp para reservar tu espacio.'
-              },
-              {
-                icon: MapPin,
-                title: 'Llegamos a tu puerta',
-                description: 'Nuestra profesional acude a tu domicilio con equipo esterilizado y puntualidad.'
-              }
-            ].map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="relative flex flex-col items-center text-center"
-              >
-                {/* Number Badge */}
-                <div className="w-24 h-24 rounded-full bg-white border-4 border-accent flex items-center justify-center mb-6 shadow-xl shadow-primary/20 relative z-10">
-                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold shadow-inner">
-                    {index + 1}
-                  </div>
-                </div>
-                <h3 className="text-2xl font-serif font-bold mb-4 text-primary">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed px-4">{step.description}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* ── GALERÍA ── */}
+      <section id="galeria" style={{ padding:'80px 48px 0', background:'#000' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
+          <SectionHeader eyebrow="Galería de trabajos" title="Arte que" italic="habla por sí solo" />
+          <GalleryFilter categories={categories} activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+        </motion.div>
+        <div style={{ columns:'1', columnGap:2 }} className="sm:columns-2 lg:columns-3">
+          {filtered.map((item, i) => (
+            <motion.div key={item.id} initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}
+              style={{ breakInside:'avoid', marginBottom:2, position:'relative', overflow:'hidden', cursor:'pointer' }}
+              className="group">
+              <img src={item.image} alt={item.categoria} style={{ width:'100%', height:'auto', display:'block', transition:'transform 0.7s' }}
+                onMouseEnter={e => e.currentTarget.style.transform='scale(1.05)'}
+                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}
+              />
+              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,30,60,0.85), transparent)', opacity:0, transition:'opacity 0.3s', display:'flex', alignItems:'flex-end', padding:20 }}
+                onMouseEnter={e => e.currentTarget.style.opacity=1}
+                onMouseLeave={e => e.currentTarget.style.opacity=0}>
+                <span style={{ border:'1px solid rgba(255,255,255,0.5)', padding:'4px 14px', fontSize:10, letterSpacing:'2px', color:'#fff', textTransform:'uppercase' }}>{item.categoria}</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      <section id="galeria" className="py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-primary">
-              Galería de Arte en Uñas
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Inspírate con nuestros últimos trabajos. Cada diseño es creado con pasión y detalle.
-            </p>
-          </motion.div>
+      <Divider />
 
-          <GalleryFilter
-            categories={categories}
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-          />
-
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {filteredGallery.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="break-inside-avoid group relative overflow-hidden rounded-2xl shadow-lg border border-border"
-              >
-                <img
-                  src={item.image}
-                  alt={`Trabajo de ${item.categoria}`}
-                  className="w-full h-auto transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                  <div>
-                    <span className="text-white font-medium bg-primary/90 px-3 py-1 rounded-full text-sm backdrop-blur-md shadow-md border border-white/20">
-                      {item.categoria}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+      {/* ── TESTIMONIOS ── */}
+      <section id="testimonios" style={{ padding:'80px 48px', background:'#030810' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
+          <SectionHeader eyebrow="Testimonios" title="Lo que dicen" italic="nuestras clientas" />
+        </motion.div>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={stagger}
+          style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))', gap:2 }}>
+          {testimonials.map(t => (
+            <motion.div key={t.id} variants={fadeUp}>
+              <TestimonialCard testimonial={t} />
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
-      <section id="testimonios" className="py-24 bg-primary/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-primary">
-              Nuestras clientas de Michelle Nails dicen...
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              La satisfacción de quienes nos eligen es nuestra mejor carta de presentación.
-            </p>
-          </motion.div>
+      <Divider />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <TestimonialCard testimonial={testimonial} />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="contacto" className="py-24 bg-background relative">
-        <div className="absolute left-0 w-1/3 h-full bg-accent/30 rounded-r-[100px] -z-10 hidden lg:block"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <BookingForm services={services} />
-          </motion.div>
-        </div>
+      {/* ── CONTACTO ── */}
+      <section id="contacto" style={{ padding:'80px 48px', background:'#000' }}>
+        <BookingForm services={services} />
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 };
 

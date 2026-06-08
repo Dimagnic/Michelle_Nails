@@ -1,25 +1,20 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 
-const GalleryFilter = ({ categories, activeCategory, onCategoryChange }) => {
-  return (
-    <div className="flex flex-wrap gap-3 justify-center mb-12">
-      {categories.map((category) => (
-        <Button
-          key={category}
-          onClick={() => onCategoryChange(category)}
-          variant="outline"
-          className={`transition-all duration-300 rounded-full px-6 py-2 border ${
-            activeCategory === category
-              ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
-              : 'bg-white text-foreground border-border hover:border-secondary hover:text-secondary hover:bg-accent/50'
-          }`}
-        >
-          {category}
-        </Button>
-      ))}
-    </div>
-  );
-};
+const GalleryFilter = ({ categories, activeCategory, onCategoryChange }) => (
+  <div style={{ display: 'flex', gap: 2, marginBottom: 32, flexWrap: 'wrap' }}>
+    {categories.map(cat => (
+      <button key={cat} onClick={() => onCategoryChange(cat)} style={{
+        background: activeCategory === cat ? '#0066CC' : 'transparent',
+        color: activeCategory === cat ? '#fff' : 'rgba(255,255,255,0.45)',
+        border: `1px solid ${activeCategory === cat ? '#0066CC' : 'rgba(255,255,255,0.12)'}`,
+        padding: '8px 20px', fontSize: 10, letterSpacing: '2.5px', textTransform: 'uppercase',
+        cursor: 'pointer', fontFamily: "'Montserrat', sans-serif", transition: 'all 0.2s',
+      }}
+      onMouseEnter={e => { if (activeCategory !== cat) e.currentTarget.style.borderColor = '#0066CC'; }}
+      onMouseLeave={e => { if (activeCategory !== cat) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}
+      >{cat}</button>
+    ))}
+  </div>
+);
 
 export default GalleryFilter;
