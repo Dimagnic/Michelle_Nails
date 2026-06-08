@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { LogOut, Trash2 } from 'lucide-react';
+import { LogOut, Trash2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'sonner';
@@ -52,21 +52,45 @@ const AdminPanel = () => {
     <div style={{ minHeight:'100vh', background:'#000', fontFamily:"'Montserrat', sans-serif" }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
 
-      <header style={{ background:'#070d14', borderBottom:'1px solid rgba(0,102,204,0.2)', position:'sticky', top:0, zIndex:10, padding:'0 32px' }}>
-        <div style={{ maxWidth:1280, margin:'0 auto', height:64, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:18, letterSpacing:5, color:'#fff', fontWeight:300 }}>
-            MICHELLE <span style={{ color:'#3B9EFF' }}>NAILS</span>
-            <span style={{ fontSize:10, letterSpacing:'2px', color:'rgba(255,255,255,0.3)', marginLeft:16, fontFamily:"'Montserrat', sans-serif" }}>PANEL ADMIN</span>
-          </span>
-          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-            <span style={{ fontSize:11, color:'rgba(255,255,255,0.35)' }}>{currentUser?.email}</span>
+      <header style={{ background:'#070d14', borderBottom:'1px solid rgba(0,102,204,0.2)', position:'sticky', top:0, zIndex:10, padding:'0 clamp(16px,4vw,32px)' }}>
+        <div style={{ maxWidth:1280, margin:'0 auto', height:64, display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+
+          {/* Izquierda: volver + logo */}
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            <button onClick={() => navigate('/')} style={{
+              display:'flex', alignItems:'center', gap:7,
+              background:'rgba(0,102,204,0.12)', border:'1px solid rgba(0,102,204,0.35)',
+              color:'#3B9EFF', padding:'8px 14px', fontSize:11, letterSpacing:'1.5px',
+              textTransform:'uppercase', cursor:'pointer', fontFamily:"'Montserrat', sans-serif",
+              transition:'all 0.2s', borderRadius:2, flexShrink:0,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(0,102,204,0.25)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(0,102,204,0.12)'; }}>
+              <ArrowLeft size={14} />
+              <span className="hidden sm:inline">Volver al sitio</span>
+            </button>
+
+            <span style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'clamp(14px,3vw,18px)', letterSpacing:'clamp(2px,1vw,5px)', color:'#fff', fontWeight:300 }}>
+              MICHELLE <span style={{ color:'#3B9EFF' }}>NAILS</span>
+              <span style={{ fontSize:9, letterSpacing:'2px', color:'rgba(255,255,255,0.25)', marginLeft:12, fontFamily:"'Montserrat', sans-serif", textTransform:'uppercase' }}>Admin</span>
+            </span>
+          </div>
+
+          {/* Derecha: email + cerrar sesión */}
+          <div style={{ display:'flex', alignItems:'center', gap:12, flexShrink:0 }}>
+            <span style={{ fontSize:11, color:'rgba(255,255,255,0.3)', display:'none' }} className="sm:inline-block">{currentUser?.email}</span>
             <button onClick={async () => { await logout(); navigate('/'); }} style={{
-              display:'flex', alignItems:'center', gap:6, background:'none',
-              border:'1px solid rgba(255,255,255,0.12)', color:'rgba(255,255,255,0.5)',
-              padding:'7px 16px', fontSize:11, letterSpacing:'1.5px', textTransform:'uppercase',
+              display:'flex', alignItems:'center', gap:6,
+              background:'rgba(220,38,38,0.1)', border:'1px solid rgba(220,38,38,0.3)',
+              color:'rgba(255,100,100,0.8)', padding:'8px 14px', fontSize:11,
+              letterSpacing:'1.5px', textTransform:'uppercase',
               cursor:'pointer', fontFamily:"'Montserrat', sans-serif",
-            }}>
-              <LogOut size={13} /> Salir
+              transition:'all 0.2s', borderRadius:2,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(220,38,38,0.25)'; e.currentTarget.style.color='#ff6b6b'; }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(220,38,38,0.1)'; e.currentTarget.style.color='rgba(255,100,100,0.8)'; }}>
+              <LogOut size={13} />
+              <span className="hidden sm:inline">Cerrar sesión</span>
             </button>
           </div>
         </div>
