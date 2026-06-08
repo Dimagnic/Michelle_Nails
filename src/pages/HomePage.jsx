@@ -11,6 +11,16 @@ import TestimonialCard from '@/components/TestimonialCard';
 import BookingForm from '@/components/BookingForm';
 import { supabase } from '@/lib/supabaseClient';
 
+const useMobile = () => {
+  const [m, setM] = React.useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  React.useEffect(() => {
+    const h = () => setM(window.innerWidth < 768);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, []);
+  return m;
+};
+
 const WHATSAPP = import.meta.env.VITE_WHATSAPP_NUMBER || '522221234567';
 
 const defaultServices = [
@@ -54,6 +64,7 @@ const SectionHeader = ({ eyebrow, title, italic }) => (
 );
 
 const HomePage = () => {
+  const isMobile = useMobile();
   const [services, setServices] = useState([]);
   const [gallery, setGallery] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
@@ -173,7 +184,7 @@ const HomePage = () => {
           <SectionHeader eyebrow="Cómo funciona" title="Tu experiencia" italic="sin complicaciones" />
         </motion.div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'clamp(24px,4vw,0px)', maxWidth:900, margin:'0 auto', position:'relative' }}>
-          <div className='hidden md:block' style={{ position:'absolute', top:28, left:'16%', right:'16%', height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.5),rgba(59,158,255,0.5),rgba(0,102,204,0.5),transparent)' }} />
+          {!isMobile && <div style={{ position:'absolute', top:28, left:'16%', right:'16%', height:1, background:'linear-gradient(90deg,transparent,rgba(0,102,204,0.5),rgba(59,158,255,0.5),rgba(0,102,204,0.5),transparent)' }} />}
           {[
             { num:'1', title:'Elige y agenda', desc:'Selecciona tu servicio y reserva tu cita desde la web o WhatsApp en menos de 2 minutos.' },
             { num:'2', title:'Confirmación', desc:'Recibes confirmación inmediata. Te recordamos 24 horas antes de tu cita.' },
