@@ -194,7 +194,7 @@ const HomePage = () => {
       <Divider />
 
       {/* ── GALERÍA ── */}
-      <section id="galeria" style={{ padding:'80px 0 0', background:'#000' }}>
+      <section id="galeria" style={{ paddingTop:80, paddingBottom:0, background:'#000', overflow:'hidden' }}>
         <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}
           style={{ padding:'0 48px', marginBottom:32 }}>
           <SectionHeader eyebrow="Galería de trabajos" title="Arte que" italic="habla por sí solo" />
