@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import ServiceCard from '@/components/ServiceCard';
 import ServiceCalculator from '@/components/ServiceCalculator';
 import GalleryFilter from '@/components/GalleryFilter';
+import GalleryCarousel from '@/components/GalleryCarousel';
 import TestimonialCard from '@/components/TestimonialCard';
 import BookingForm from '@/components/BookingForm';
 import { supabase } from '@/lib/supabaseClient';
@@ -193,28 +194,13 @@ const HomePage = () => {
       <Divider />
 
       {/* ── GALERÍA ── */}
-      <section id="galeria" style={{ padding:'80px 48px 0', background:'#000' }}>
-        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}>
+      <section id="galeria" style={{ padding:'80px 0 0', background:'#000' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}
+          style={{ padding:'0 48px', marginBottom:32 }}>
           <SectionHeader eyebrow="Galería de trabajos" title="Arte que" italic="habla por sí solo" />
           <GalleryFilter categories={categories} activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
         </motion.div>
-        <div style={{ columns:'1', columnGap:2 }} className="sm:columns-2 lg:columns-3">
-          {filtered.map((item, i) => (
-            <motion.div key={item.id} initial="hidden" whileInView="show" viewport={{ once:true }} variants={fadeUp}
-              style={{ breakInside:'avoid', marginBottom:2, position:'relative', overflow:'hidden', cursor:'pointer' }}
-              className="group">
-              <img src={item.image} alt={item.categoria} style={{ width:'100%', height:'auto', display:'block', transition:'transform 0.7s' }}
-                onMouseEnter={e => e.currentTarget.style.transform='scale(1.05)'}
-                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}
-              />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,30,60,0.85), transparent)', opacity:0, transition:'opacity 0.3s', display:'flex', alignItems:'flex-end', padding:20 }}
-                onMouseEnter={e => e.currentTarget.style.opacity=1}
-                onMouseLeave={e => e.currentTarget.style.opacity=0}>
-                <span style={{ border:'1px solid rgba(255,255,255,0.5)', padding:'4px 14px', fontSize:10, letterSpacing:'2px', color:'#fff', textTransform:'uppercase' }}>{item.categoria}</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <GalleryCarousel images={filtered} />
       </section>
 
       <Divider />
