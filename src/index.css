@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 340 15% 15%;
+
+    /* Rosa vino principal - Michelle Nails */
+    --primary: 340 55% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Rosa medio */
+    --secondary: 340 40% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Rosa palo suave */
+    --accent: 340 30% 96%;
+    --accent-foreground: 340 55% 45%;
+
+    --muted: 340 20% 96%;
+    --muted-foreground: 340 15% 48%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 340 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 15% 15%;
+
+    --border: 340 20% 88%;
+    --input: 340 20% 88%;
+    --ring: 340 55% 45%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar */
+    --sidebar-background: 340 30% 98%;
+    --sidebar-foreground: 340 15% 15%;
+    --sidebar-primary: 340 55% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 30% 94%;
+    --sidebar-accent-foreground: 340 55% 45%;
+    --sidebar-border: 340 20% 88%;
+    --sidebar-ring: 340 55% 45%;
+  }
+
+  .dark {
+    --background: 340 15% 8%;
+    --foreground: 0 0% 100%;
+    --primary: 340 55% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 340 35% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 340 20% 14%;
+    --accent-foreground: 340 55% 60%;
+    --muted: 340 15% 14%;
+    --muted-foreground: 340 15% 65%;
+    --card: 340 15% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 340 15% 10%;
+    --popover-foreground: 0 0% 100%;
+    --border: 340 15% 20%;
+    --input: 340 15% 20%;
+    --sidebar-background: 340 15% 8%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 340 55% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 15% 14%;
+    --sidebar-accent-foreground: 340 55% 60%;
+    --sidebar-border: 340 15% 20%;
+    --sidebar-ring: 340 55% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  .bg-gradient-michelle {
+    background: linear-gradient(
+      135deg,
+      hsl(340 55% 35%) 0%,
+      hsl(340 45% 50%) 50%,
+      hsl(20 60% 60%) 100%
+    );
+  }
+
+  .text-gradient-michelle {
+    background: linear-gradient(135deg, hsl(340 55% 45%), hsl(20 60% 55%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
